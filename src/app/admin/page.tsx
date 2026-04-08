@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase, RifaNumber } from '@/utils/supabase'
+import { supabase, RifaNumber } from '../../utils/supabase'
 import { CheckCircle, XCircle, ExternalLink, Lock } from 'lucide-react'
 
 export default function AdminPage() {

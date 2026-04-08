@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { supabase, RifaNumber } from '@/utils/supabase'
+import { supabase, RifaNumber } from '../utils/supabase'
 import { X, Upload, CheckCircle, Clock, Ban } from 'lucide-react'
 
 // ─── Datos bancarios estáticos ───────────────────────────────────────────
