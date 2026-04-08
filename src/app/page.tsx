@@ -8,7 +8,7 @@ import toast from 'react-hot-toast'
 // ─── Configuración Visual Elegante ───────────────────────────────────────
 const BANK_INFO = {
   banco: 'Banco Estado',
-  titular: 'Juan Pérez González',
+  titular: 'Gabriel Rojas Campos',
   rut: '12.345.678-9',
   cuenta: '123456789',
   tipo: 'Cuenta Corriente',
@@ -136,8 +136,8 @@ export default function Home() {
           <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5" style={{ background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.15)' }}>
             <Ticket size={32} className="text-amber-400" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-50 tracking-tighter">Gran Rifa <span className="text-amber-400">Exclusiva</span></h1>
-          <p className="text-slate-400 mt-3 max-w-xl text-base md:text-lg">Participa y gana increíbles premios. Selecciona tu número de la suerte a continuación y sigue los pasos.</p>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-50 tracking-tighter">Rifa Tatuaje Gabo Tattooo <span className="text-amber-400">Exclusiva</span></h1>
+          <p className="text-slate-400 mt-3 max-w-xl text-base md:text-lg">Participa y llevate un tatuaje. Selecciona tu número de la suerte a continuación y sigue los pasos.</p>
         </header>
 
         {/* Estadísticas Sobrias */}
