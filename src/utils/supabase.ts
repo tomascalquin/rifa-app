@@ -8,6 +8,7 @@ export type RifaNumber = {
   buyer_email: string | null
   buyer_phone: string | null
   receipt_url: string | null
+  buyer_instagram: string | null
 }
 
 // Cliente público — para el frontend (anon key)

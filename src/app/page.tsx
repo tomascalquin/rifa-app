@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { supabase, RifaNumber } from '../utils/supabase' // Ruta relativa para evitar errores en Vercel
-import { X, Upload, CheckCircle } from 'lucide-react'
+import { supabase, RifaNumber } from '../../utils/supabase' 
+import { X, Upload, CheckCircle, Clock, Ban } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 // ─── Datos bancarios estáticos ───────────────────────────────────────────
@@ -27,7 +27,7 @@ function statusStyle(status: string) {
 
 // ─── Tipos ────────────────────────────────────────────────────────────────
 type FormData = {
-  name: string; email: string; phone: string; file: File | null
+  name: string; email: string; phone: string; instagram: string; file: File | null
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────
@@ -37,7 +37,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
-  const [form, setForm] = useState<FormData>({ name: '', email: '', phone: '', file: null })
+  const [form, setForm] = useState<FormData>({ name: '', email: '', phone: '', instagram: '', file: null })
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Carga inicial
@@ -47,7 +47,7 @@ export default function Home() {
         .from('rifa_numbers')
         .select('*')
         .order('number')
-      if (data) setNumbers(data)
+      if (data) setNumbers(data as RifaNumber[])
       setLoading(false)
     }
     load()
@@ -73,7 +73,7 @@ export default function Home() {
   function handleClick(n: RifaNumber) {
     if (n.status !== 'available') return
     setSelected(n)
-    setForm({ name: '', email: '', phone: '', file: null })
+    setForm({ name: '', email: '', phone: '', instagram: '', file: null })
     setSuccess(false)
   }
 
@@ -88,16 +88,15 @@ export default function Home() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     
-    // Validación de campos obligatorios con Toast
+    // Validación de campos obligatorios
     if (!form.name || !form.email || !form.phone || !form.file) {
-      toast.error('Por favor, completa todos los campos y sube el comprobante.')
+      toast.error('Por favor, completa todos los campos obligatorios.')
       return
     }
 
-    if (!selected) return
-
+    if (!selected || !form.file) return
     setSubmitting(true)
-    const toastId = toast.loading('Procesando tu reserva...')
+    const toastId = toast.loading('Reservando tu número...')
 
     // 1. Bloqueo optimista: actualizar UI inmediatamente
     setNumbers(prev =>
@@ -111,7 +110,6 @@ export default function Home() {
       const { error: uploadError } = await supabase.storage
         .from('receipts')
         .upload(path, form.file)
-      
       if (uploadError) throw uploadError
 
       // 3. Obtener URL pública
@@ -125,12 +123,12 @@ export default function Home() {
           buyer_name: form.name,
           buyer_email: form.email,
           buyer_phone: form.phone,
+          buyer_instagram: form.instagram, // NUEVO CAMPO
           receipt_url: urlData.publicUrl,
           updated_at: new Date().toISOString(),
         })
         .eq('id', selected.id)
         .eq('status', 'available') // ← seguridad: solo si sigue available
-      
       if (dbError) throw dbError
 
       toast.success('¡Número reservado con éxito!', { id: toastId })
@@ -140,7 +138,7 @@ export default function Home() {
       setNumbers(prev =>
         prev.map(n => n.id === selected.id ? { ...n, status: 'available' } : n)
       )
-      toast.error('Error al reservar. Alguien pudo haberlo tomado antes.', { id: toastId })
+      toast.error('Error al procesar tu reserva. Por favor intenta nuevamente.', { id: toastId })
       console.error(err)
     } finally {
       setSubmitting(false)
@@ -273,7 +271,7 @@ export default function Home() {
                   {/* Formulario */}
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1">Nombre completo <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium mb-1">Nombre completo *</label>
                       <input
                         type="text" required
                         value={form.name}
@@ -283,7 +281,7 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Email <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium mb-1">Email *</label>
                       <input
                         type="email" required
                         value={form.email}
@@ -293,7 +291,7 @@ export default function Home() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Teléfono <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium mb-1">Teléfono *</label>
                       <input
                         type="tel" required
                         value={form.phone}
@@ -302,8 +300,24 @@ export default function Home() {
                         placeholder="+56 9 1234 5678"
                       />
                     </div>
+                    
+                    {/* CAMPO DE INSTAGRAM AÑADIDO AQUÍ */}
                     <div>
-                      <label className="block text-sm font-medium mb-1">Comprobante de transferencia <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium mb-1">Instagram (Opcional)</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2 text-gray-400">@</span>
+                        <input
+                          type="text"
+                          value={form.instagram}
+                          onChange={e => setForm(f => ({ ...f, instagram: e.target.value }))}
+                          className="w-full border rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          placeholder="usuario"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Comprobante de transferencia *</label>
                       <div
                         onClick={() => fileRef.current?.click()}
                         className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:bg-gray-50 transition-colors"
