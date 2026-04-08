@@ -34,58 +34,51 @@ export default function AdminPage() {
     setLoading(false)
   }
 
-  // BUG 1 FIX: approve usa setState en vez de loadData()
+  // SOLUCIÓN: Usar la API del servidor en lugar de actualizar desde el cliente
   async function approve(id: string, num: number) {
     if (!confirm(`¿Confirmar pago del número #${num}?`)) return
+    
+    setLoading(true) // Bloquea la UI mientras carga
+    try {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'approve', id, password: pwd })
+      })
 
-    const { error } = await supabase
-      .from('rifa_numbers')
-      .update({ status: 'sold', updated_at: new Date().toISOString() })
-      .eq('id', id)
+      if (!res.ok) throw new Error('Fallo en la base de datos')
 
-    if (error) {
-      toast.error('Error al actualizar')
-    } else {
       toast.success(`Número #${num} marcado como VENDIDO`)
-      // Quita de pending y agrega a sold con setState
-      const item = pending.find(n => n.id === id)
-      if (item) {
-        setPending(prev => prev.filter(n => n.id !== id))
-        setSold(prev => [...prev, { ...item, status: 'sold' as const }].sort((a, b) => a.number - b.number))
-      }
+      await loadData() // Carga los datos reales de la base de datos
+    } catch (err) {
+      toast.error('Error de seguridad: No se pudo actualizar en DB')
+      setLoading(false)
     }
   }
 
-  // BUG 1 FIX: reject diferencia si viene de pending o sold
+  // SOLUCIÓN: Usar la API del servidor para rechazar
   async function reject(id: string, num: number, fromSection: 'pending' | 'sold') {
     if (!confirm(`¿RECHAZAR número #${num}? Se borrarán los datos y quedará disponible nuevamente.`)) return
 
-    const { error } = await supabase
-      .from('rifa_numbers')
-      .update({
-        status: 'available',
-        buyer_name: null,
-        buyer_email: null,
-        buyer_phone: null,
-        buyer_instagram: null,
-        receipt_url: null,
-        updated_at: new Date().toISOString(),
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reject', id, password: pwd })
       })
-      .eq('id', id)
 
-    if (error) {
-      toast.error('Error al liberar número')
-    } else {
+      if (!res.ok) throw new Error('Fallo en la base de datos')
+
       toast.success(`Número #${num} liberado`)
-      // BUG 1 FIX: quita de la sección correcta, no agrega a sold
-      if (fromSection === 'pending') {
-        setPending(prev => prev.filter(n => n.id !== id))
-      } else {
-        setSold(prev => prev.filter(n => n.id !== id))
-      }
+      await loadData() // Carga los datos reales de la base de datos
+    } catch (err) {
+      toast.error('Error de seguridad: No se pudo liberar en DB')
+      setLoading(false)
     }
   }
 
+  // ─── Vista de Login ────────────────────────────────────────────────────────
   if (!authed) return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#0f172a' }}>
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -121,6 +114,7 @@ export default function AdminPage() {
     </div>
   )
 
+  // ─── Vista Principal Admin ─────────────────────────────────────────────────
   return (
     <main className="min-h-screen" style={{ background: '#0f172a', fontFamily: "'DM Sans', 'Inter', sans-serif" }}>
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -153,6 +147,7 @@ export default function AdminPage() {
             </div>
             <button
               onClick={loadData}
+              disabled={loading}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
               style={{ background: 'rgba(255,255,255,0.06)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.08)' }}
             >
@@ -216,7 +211,8 @@ export default function AdminPage() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => approve(n.id, n.number)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                              disabled={loading}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105 disabled:opacity-50"
                               style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}
                               title="Aprobar"
                             >
@@ -224,7 +220,8 @@ export default function AdminPage() {
                             </button>
                             <button
                               onClick={() => reject(n.id, n.number, 'pending')}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105"
+                              disabled={loading}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all hover:scale-105 disabled:opacity-50"
                               style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.18)' }}
                               title="Rechazar"
                             >
@@ -285,7 +282,8 @@ export default function AdminPage() {
                         <td className="px-5 py-4">
                           <button
                             onClick={() => reject(n.id, n.number, 'sold')}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                            disabled={loading}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105 disabled:opacity-50"
                             style={{ background: 'rgba(239,68,68,0.08)', color: '#f87171', border: '1px solid rgba(239,68,68,0.12)' }}
                             title="Revertir a disponible"
                           >
