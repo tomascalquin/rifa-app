@@ -1,4 +1,5 @@
-import './globals.css' // Asegúrate de haber movido tu archivo globals.css a la carpeta src/app/
+import './globals.css'
+import { Toaster } from 'react-hot-toast' // Agrega esto
 
 export const metadata = {
   title: 'Gran Rifa',
@@ -12,7 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster position="top-center" /> {/* Agrega esto */}
+      </body>
     </html>
   )
 }
