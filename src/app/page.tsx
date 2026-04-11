@@ -126,7 +126,7 @@ export default function Home() {
           <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5" style={{ background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.15)' }}>
             <Ticket size={32} className="text-amber-400" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-slate-50 tracking-tighter">Gran Rifa <span className="text-amber-400">Solidaria</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black text-slate-50 tracking-tighter">Rifa <span className="text-amber-400">gabo.tattooo</span></h1>
           <p className="text-slate-400 mt-3 max-w-xl">Selecciona tu número, realiza la transferencia y sube tu comprobante para participar.</p>
         </header>
 
@@ -182,7 +182,7 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  {/* Datos Bancarios con Copiado Total */}
+                  {/* Datos Bancarios con Copiado Total Formato Bancos */}
                   <div className="bg-slate-950/50 rounded-2xl p-5 border border-slate-800 mb-6 space-y-4">
                     
                     <div className="flex justify-between items-center border-b border-slate-800/50 pb-3">
@@ -190,10 +190,11 @@ export default function Home() {
                       <button 
                         type="button"
                         onClick={() => {
-                          const textToCopy = `Datos de Transferencia:\nTitular: ${BANK_INFO.titular}\nRUT: ${BANK_INFO.rut}\nBanco: ${BANK_INFO.banco}\nTipo de cuenta: ${BANK_INFO.tipo}\nN° de cuenta: ${BANK_INFO.cuenta}\nEmail: ${BANK_INFO.email}\nMonto: ${BANK_INFO.monto}`;
+                          // Formato EXACTO que detectan las apps de los bancos en Chile
+                          const textToCopy = `Nombre: ${BANK_INFO.titular}\nRUT: ${BANK_INFO.rut}\nBanco: ${BANK_INFO.banco}\nTipo de cuenta: ${BANK_INFO.tipo}\nN° de cuenta: ${BANK_INFO.cuenta}\nEmail: ${BANK_INFO.email}`;
                           navigator.clipboard.writeText(textToCopy);
                           setCopiedField('all');
-                          toast.success('Todos los datos copiados');
+                          toast.success('Datos copiados (Formato bancario)');
                           setTimeout(() => setCopiedField(null), 2000);
                         }}
                         className="flex items-center gap-1.5 text-xs bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg transition-colors font-semibold"
