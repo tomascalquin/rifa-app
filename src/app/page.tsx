@@ -8,11 +8,11 @@ import toast from 'react-hot-toast'
 // ─── Configuración Visual Elegante con datos de Gabriel ──────────────────
 const BANK_INFO = {
   banco: 'Banco Falabella',
-  titular: 'Gabriel Rojas', // Actualizado a Gabriel
-  rut: '21.853.410-4',      // Asegúrate de cambiar esto por el RUT real de Gabriel
-  cuenta: '19840580347',      // Asegúrate de cambiar esto por la cuenta real de Gabriel
+  titular: 'Gabriel Rojas',
+  rut: '21.853.410-4',      
+  cuenta: '19840580347',      
   tipo: 'Cuenta Corriente',
-  email: 'gaborojasc88@gmail.com', // Actualizado según tu solicitud
+  email: 'gaborojasc88@gmail.com', 
   monto: '$3.000 CLP',
 }
 
@@ -53,13 +53,6 @@ export default function Home() {
 
     return () => { supabase.removeChannel(channel) }
   }, [])
-
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    toast.success(`${field} copiado`)
-    setTimeout(() => setCopiedField(null), 2000)
-  }
 
   function handleClick(n: RifaNumber) {
     if (n.status !== 'available') return
@@ -189,30 +182,40 @@ export default function Home() {
                 </div>
               ) : (
                 <>
-                  {/* Datos Bancarios con Copiado */}
+                  {/* Datos Bancarios con Copiado Total */}
                   <div className="bg-slate-950/50 rounded-2xl p-5 border border-slate-800 mb-6 space-y-4">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-amber-400 text-center">Datos de Gabriel</h3>
+                    
+                    <div className="flex justify-between items-center border-b border-slate-800/50 pb-3">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-amber-400">Datos de Gabriel</h3>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const textToCopy = `Datos de Transferencia:\nTitular: ${BANK_INFO.titular}\nRUT: ${BANK_INFO.rut}\nBanco: ${BANK_INFO.banco}\nTipo de cuenta: ${BANK_INFO.tipo}\nN° de cuenta: ${BANK_INFO.cuenta}\nEmail: ${BANK_INFO.email}\nMonto: ${BANK_INFO.monto}`;
+                          navigator.clipboard.writeText(textToCopy);
+                          setCopiedField('all');
+                          toast.success('Todos los datos copiados');
+                          setTimeout(() => setCopiedField(null), 2000);
+                        }}
+                        className="flex items-center gap-1.5 text-xs bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg transition-colors font-semibold"
+                      >
+                        {copiedField === 'all' ? <Check size={14} /> : <Copy size={14} />}
+                        {copiedField === 'all' ? '¡Copiado!' : 'Copiar todo'}
+                      </button>
+                    </div>
+
                     <div className="space-y-3">
                       {[
                         { label: 'Titular', value: BANK_INFO.titular },
-                        { label: 'RUT', value: BANK_INFO.rut, copyable: true },
-                        { label: 'Cuenta', value: BANK_INFO.cuenta, copyable: true },
+                        { label: 'RUT', value: BANK_INFO.rut },
                         { label: 'Banco', value: BANK_INFO.banco },
-                        { label: 'Email', value: BANK_INFO.email }
+                        { label: 'Tipo', value: BANK_INFO.tipo },
+                        { label: 'Cuenta', value: BANK_INFO.cuenta },
+                        { label: 'Email', value: BANK_INFO.email },
+                        { label: 'Monto', value: BANK_INFO.monto }
                       ].map((item) => (
                         <div key={item.label} className="flex justify-between items-center text-sm">
                           <span className="text-slate-500">{item.label}:</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-slate-200 font-semibold">{item.value}</span>
-                            {item.copyable && (
-                              <button 
-                                onClick={() => copyToClipboard(item.value, item.label)}
-                                className="p-1.5 hover:bg-slate-800 rounded-md transition-colors text-amber-400"
-                              >
-                                {copiedField === item.label ? <Check size={14} /> : <Copy size={14} />}
-                              </button>
-                            )}
-                          </div>
+                          <span className="text-slate-200 font-semibold text-right">{item.value}</span>
                         </div>
                       ))}
                     </div>
@@ -225,11 +228,11 @@ export default function Home() {
                       <input type="tel" required value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm" placeholder="Teléfono *"/>
                       <input type="text" value={form.instagram} onChange={e => setForm(f => ({ ...f, instagram: e.target.value }))} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm" placeholder="Instagram (@)"/>
                     </div>
-                    <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-slate-800 rounded-2xl p-6 text-center cursor-pointer hover:bg-slate-950">
-                      {form.file ? <div className="text-emerald-400 font-semibold">{form.file.name}</div> : <div className="text-slate-500 text-sm">Sube tu comprobante *</div>}
+                    <div onClick={() => fileRef.current?.click()} className="border-2 border-dashed border-slate-800 rounded-2xl p-6 text-center cursor-pointer hover:bg-slate-950 transition-colors">
+                      {form.file ? <div className="text-emerald-400 font-semibold">{form.file.name}</div> : <div className="text-slate-500 text-sm flex flex-col items-center gap-2"><Upload size={20}/> Sube tu comprobante *</div>}
                     </div>
                     <input ref={fileRef} type="file" accept="image/*,.pdf" required className="hidden" onChange={e => setForm(f => ({ ...f, file: e.target.files?.[0] ?? null }))} />
-                    <button type="submit" disabled={submitting} className="w-full bg-amber-500 text-slate-950 py-4 rounded-xl font-black hover:bg-amber-400 disabled:opacity-50">
+                    <button type="submit" disabled={submitting} className="w-full bg-amber-500 text-slate-950 py-4 rounded-xl font-black hover:bg-amber-400 disabled:opacity-50 transition-colors">
                       {submitting ? 'ENVIANDO...' : 'CONFIRMAR Y ENVIAR'}
                     </button>
                   </form>
