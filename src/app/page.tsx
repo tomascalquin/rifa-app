@@ -7,12 +7,12 @@ import toast from 'react-hot-toast'
 
 // ─── Configuración Visual Elegante ───────────────────────────────────────
 const BANK_INFO = {
-  banco: 'Banco Estado',
+  banco: 'Banco Falabella',
   titular: 'Gabriel Rojas Campos',
-  rut: '12.345.678-9',
-  cuenta: '123456789',
+  rut: '21.853.410-4',
+  cuenta: '19840580347',
   tipo: 'Cuenta Corriente',
-  monto: '$5.000 CLP',
+  monto: '$3.000 CLP',
 }
 
 // Colores sobrios y elegantes por estado
@@ -180,7 +180,7 @@ export default function Home() {
         )}
 
         <footer className="text-center py-10 border-t border-slate-800 text-slate-700 text-xs">
-          Rifa App &copy; 2024 - Sistema de venta elegante y seguro.
+          Rifa App &copy; 2026
         </footer>
       </div>
 
