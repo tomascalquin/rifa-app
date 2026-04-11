@@ -7,13 +7,13 @@ import toast from 'react-hot-toast'
 
 // ─── Configuración Visual Elegante con datos de Gabriel ──────────────────
 const BANK_INFO = {
-  banco: 'Banco Estado',
+  banco: 'Banco Falabella',
   titular: 'Gabriel Rojas', // Actualizado a Gabriel
-  rut: '12.345.678-9',      // Asegúrate de cambiar esto por el RUT real de Gabriel
-  cuenta: '123456789',      // Asegúrate de cambiar esto por la cuenta real de Gabriel
+  rut: '21.853.410-4',      // Asegúrate de cambiar esto por el RUT real de Gabriel
+  cuenta: '19840580347',      // Asegúrate de cambiar esto por la cuenta real de Gabriel
   tipo: 'Cuenta Corriente',
   email: 'gaborojasc88@gmail.com', // Actualizado según tu solicitud
-  monto: '$5.000 CLP',
+  monto: '$3.000 CLP',
 }
 
 function statusStyle(status: string) {
